@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcare21-application
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: mcare21-application
+  template:
+    metadata:
+      labels:
+        app: mcare21application
+        service: mcare21-application
+    spec:
+      containers:
+      - name: mcare21-application
+        image: mcare21containerregistry.azurecr.io/mcare21-application
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          protocol: TCP 
+        env:
+            - name: development
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcare21-application
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+  labels:
+    app: mcare21application
+    service: mcare21-application
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    service: mcare21-application     
+        
